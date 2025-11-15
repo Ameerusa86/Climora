@@ -21,16 +21,21 @@ export default function AdditionalInfo({ coords }: Props) {
   });
   return (
     <Card
-      title="Additional Weather Info"
-      childrenClassName="grid grid-cols-1 md:grid-cols-2 gap-8"
+      title="Atmospheric Telemetry"
+      childrenClassName="grid grid-cols-1 md:grid-cols-2 gap-5"
     >
       {rows.map(({ label, value, Icon }) => (
-        <div className="flex justify-between" key={value}>
-          <div className="flex gap-4">
-            <span className="text-gray-500">{label}</span>
-            <Icon className="size-8" />
+        <div
+          className="flex items-center justify-between gap-4 rounded-xl bg-white/5 border border-slate-500/40 px-3 py-2 hover:border-emerald-300/70 hover:bg-white/10 transition-colors"
+          key={value}
+        >
+          <div className="flex gap-3 items-center">
+            <span className="text-[0.7rem] uppercase tracking-[0.16em] text-slate-400/90">
+              {label}
+            </span>
+            <Icon className="size-7 text-cyan-300" />
           </div>
-          <span>
+          <span className="text-sm font-semibold text-slate-50">
             <FormatComponent value={value} number={data.current[value]} />
           </span>
         </div>
