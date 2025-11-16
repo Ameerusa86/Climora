@@ -1,73 +1,94 @@
-# React + TypeScript + Vite
+# Climora
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Hyper‑vivid weather intelligence with cinematic gradients, a responsive Leaflet map, and clear insights powered by OpenWeather and MapTiler.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Climora is a React + TypeScript + Vite application that provides:
 
-## React Compiler
+- A beautiful base map (MapTiler) with optional OpenWeather overlays
+- Quick city selection via dropdown (geocoding to coordinates)
+- Interactive map clicks to set a custom location
+- Rich weather cards: current conditions, hourly, daily, and additional info
+- Air quality panel powered by OpenWeather Air Pollution API
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- React 19 + TypeScript + Vite
+- Leaflet + React‑Leaflet for maps
+- MapTiler SDK for base map tiles
+- OpenWeather One Call 3.0, Geocoding, and Air Pollution APIs
+- TanStack Query for data fetching/caching
+- Tailwind CSS for styling
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Environment Variables
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Create a `.env.local` file in the project root with your keys:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```dotenv
+VITE_API_KEY=your_openweather_api_key
+VITE_MAPTILER_API_KEY=your_maptiler_api_key
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+These are used in the client at build/runtime via `import.meta.env`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Getting Started
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Install and run the dev server:
+
+```pwsh
+npm install
+npm run dev
 ```
+
+Build and preview production output:
+
+```pwsh
+npm run build
+npm run preview
+```
+
+## Deployment (Vercel)
+
+1. In Vercel Project Settings → Environment Variables, add:
+   - `VITE_API_KEY`
+   - `VITE_MAPTILER_API_KEY`
+2. Set Build Command to `npm run build` (or `vite build`).
+3. Deploy from the `main` branch.
+
+## Features & Usage
+
+- City dropdown: choose a city to fetch coordinates (geocoding) and update all cards and the map.
+- Map click: click anywhere to set a custom location; data refreshes for that point.
+- Overlays: an OpenWeather raster overlay is added above the base tiles. The default is `precipitation`.
+
+To change the overlay layer, edit `src/components/Map.tsx` and swap `precipitation` with another OpenWeather layer (e.g. `clouds`, `temp`, `wind`, `pressure`).
+
+## Project Structure
+
+```text
+src/
+  api.ts                # OpenWeather fetch helpers (One Call, Geocoding, Air)
+  App.tsx               # App shell and layout
+  components/
+    Map.tsx             # React‑Leaflet map + MapTiler base + OWM overlay
+    cards/              # Current, Hourly, Daily, AdditionalInfo cards
+    ui/                 # UI primitives (select, tooltip, etc.)
+  lib/utils.ts          # Utility helpers
+  schemas/              # zod schemas for API validation
+```
+
+## Troubleshooting
+
+- No data on Vercel: ensure all OpenWeather endpoints use `https://` (they do in `src/api.ts`). Mixed content is blocked on HTTPS.
+- Missing marker icon in production: Leaflet markers are explicitly imported in `Map.tsx` and configured via `L.Icon.Default.mergeOptions`.
+- Dropdown updates not reflected: All cards and the map should consume unified `coords` derived from geocoding or custom clicks (handled in `App.tsx`).
+
+## Attribution
+
+- Map tiles by [MapTiler](https://www.maptiler.com/)
+- Weather data by [OpenWeather](https://openweathermap.org/)
+
+---
+
+Made with React, TypeScript, and a fondness for clean weather visuals.
