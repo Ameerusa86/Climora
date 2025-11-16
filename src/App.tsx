@@ -15,7 +15,6 @@ function App() {
     lat: 35.99,
     lon: -79.99,
   });
-  const [mapType] = useState<"basic-dark" | "basic-light">("basic-dark");
   const [location, setLocation] = useState<string>("New York");
   const [cityName, setCityName] = useState<string>("New York");
 
@@ -117,7 +116,7 @@ function App() {
         <LocationDropdown location={location} setLocation={setLocation} />
 
         <div className="w-full rounded-2xl overflow-hidden">
-          <Map coords={coords} onMapClick={onMapClick} mapType={mapType} />
+          <Map coords={coords} onMapClick={onMapClick} />
         </div>
 
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">

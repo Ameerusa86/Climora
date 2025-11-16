@@ -10,10 +10,9 @@ const MAPTILER_API_KEY = import.meta.env.VITE_MAPTILER_API_KEY;
 type Props = {
   coords: Coords;
   onMapClick: (lat: number, lon: number) => void;
-  mapType: "basic-dark" | "basic-light";
 };
 
-export default function Map({ coords, onMapClick, mapType }: Props) {
+export default function Map({ coords, onMapClick }: Props) {
   const { lat, lon } = coords;
   return (
     <MapContainer
