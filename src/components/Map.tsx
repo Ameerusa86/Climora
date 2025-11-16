@@ -1,6 +1,10 @@
 import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect } from "react";
+import L from "leaflet";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { MaptilerLayer } from "@maptiler/leaflet-maptilersdk";
 import type { Coords } from "../types";
 
@@ -11,6 +15,14 @@ type Props = {
   coords: Coords;
   onMapClick: (lat: number, lon: number) => void;
 };
+
+// Ensure the default Leaflet marker icons resolve correctly in production (Vite/Vercel)
+// Without this, the build may point to the wrong asset path and show a broken image.
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 export default function Map({ coords, onMapClick }: Props) {
   const { lat, lon } = coords;
