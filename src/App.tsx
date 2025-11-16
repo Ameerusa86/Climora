@@ -6,9 +6,34 @@ import HourlyForecast from "./components/cards/HourlyForecast";
 import Map from "./components/Map";
 import type { Coords } from "./types";
 import LocationDropdown from "./components/dropdowns/LocationDropdown";
+import { useQuery } from "@tanstack/react-query";
+import { getGeocode } from "./api";
 
 function App() {
-  const [coords, setCoords] = useState<Coords>({ lat: 35.99, lon: -79.99 });
+  const [coordinates, setCoords] = useState<Coords>({
+    lat: 35.99,
+    lon: -79.99,
+  });
+  const [mapType, setMapType] = useState<"basic-dark" | "basic-light">(
+    "basic-dark"
+  );
+  const [location, setLocation] = useState<string>("New York");
+
+  const { data } = useQuery({
+    queryKey: ["geocode", location],
+    queryFn: () => getGeocode(location),
+    enabled: location !== "custom",
+  });
+
+  const onMapClick = (lat: number, lon: number) => {
+    setCoords({ lat, lon });
+    setLocation("custom");
+  };
+
+  const coords: Coords =
+    location === "custom" || !data || data.length === 0
+      ? coordinates
+      : { lat: data[0].lat, lon: data[0].lon };
 
   return (
     <main className="min-h-screen text-slate-50">
@@ -46,13 +71,9 @@ function App() {
             </p>
           </div>
         </header>
-        <LocationDropdown location="custom" setLocation={() => {}} />
-        <div className="w-full h-80 rounded-2xl overflow-hidden">
-          <Map
-            coords={coords}
-            onMapClick={(lat, lon) => setCoords({ lat, lon })}
-            mapType="basic-dark"
-          />
+        <LocationDropdown location={location} setLocation={setLocation} />
+        <div className="w-full rounded-2xl overflow-hidden">
+          <Map coords={coords} onMapClick={onMapClick} mapType="basic-dark" />
         </div>
 
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
