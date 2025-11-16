@@ -4,6 +4,7 @@ import CurrentWeather from "./components/cards/CurrentWeather";
 import DailyForecast from "./components/cards/DailyForecast";
 import HourlyForecast from "./components/cards/HourlyForecast";
 import Map from "./components/Map";
+import AirQualityDrawer from "./components/AirQualityDrawer";
 import type { Coords } from "./types";
 import LocationDropdown from "./components/dropdowns/LocationDropdown";
 import { useQuery } from "@tanstack/react-query";
@@ -68,7 +69,8 @@ function App() {
   }, [location, coordinates.lat, coordinates.lon]);
 
   return (
-    <main className="min-h-screen text-slate-50">
+    <main className="relative min-h-screen text-slate-50 overflow-x-hidden">
+      <AirQualityDrawer coords={coords} />
       <div className="mx-auto max-w-6xl px-4 py-8 md:py-10 lg:py-12 flex flex-col gap-8">
         <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between animate-[fade-in_0.8s_ease-out_forwards]">
           <div>
