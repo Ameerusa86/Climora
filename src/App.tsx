@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdditionalInfo from "./components/cards/AdditionalInfo";
 import CurrentWeather from "./components/cards/CurrentWeather";
 import DailyForecast from "./components/cards/DailyForecast";
@@ -7,17 +7,16 @@ import Map from "./components/Map";
 import type { Coords } from "./types";
 import LocationDropdown from "./components/dropdowns/LocationDropdown";
 import { useQuery } from "@tanstack/react-query";
-import { getGeocode } from "./api";
+import { getGeocode, getReverseGeocode } from "./api";
 
 function App() {
   const [coordinates, setCoords] = useState<Coords>({
     lat: 35.99,
     lon: -79.99,
   });
-  const [mapType, setMapType] = useState<"basic-dark" | "basic-light">(
-    "basic-dark"
-  );
+  const [mapType] = useState<"basic-dark" | "basic-light">("basic-dark");
   const [location, setLocation] = useState<string>("New York");
+  const [cityName, setCityName] = useState<string>("New York");
 
   const { data } = useQuery({
     queryKey: ["geocode", location],
@@ -25,15 +24,48 @@ function App() {
     enabled: location !== "custom",
   });
 
+  const coords: Coords =
+    location === "custom" || !data || data.length === 0
+      ? coordinates
+      : { lat: data[0].lat, lon: data[0].lon };
+
+  const displayLat = Number(coords.lat.toFixed(2));
+  const displayLon = Number(coords.lon.toFixed(2));
+
   const onMapClick = (lat: number, lon: number) => {
     setCoords({ lat, lon });
     setLocation("custom");
   };
 
-  const coords: Coords =
-    location === "custom" || !data || data.length === 0
-      ? coordinates
-      : { lat: data[0].lat, lon: data[0].lon };
+  // Sync cityName when a dropdown city is selected
+  useEffect(() => {
+    if (location !== "custom" && data && data.length > 0) {
+      const name = data[0].name;
+      if (name) setCityName(name);
+    }
+  }, [location, data]);
+
+  // Reverse geocode when user clicks on the map (custom location)
+  useEffect(() => {
+    if (location !== "custom") return;
+
+    const { lat, lon } = coordinates;
+    getReverseGeocode({ lat, lon })
+      .then((result) => {
+        if (result && result.length > 0) {
+          const place = result[0];
+          const labelParts = [place.name, place.state, place.country].filter(
+            Boolean
+          );
+          setCityName(labelParts.join(", "));
+        } else {
+          setCityName("");
+        }
+      })
+      .catch(() => {
+        setCityName("");
+      });
+  }, [location, coordinates.lat, coordinates.lon]);
 
   return (
     <main className="min-h-screen text-slate-50">
@@ -62,18 +94,28 @@ function App() {
             </div>
             <p className="text-xs text-slate-300/80 max-w-xs text-left md:text-right">
               Coordinates locked on{" "}
-              <span className="font-semibold text-cyan-300">{coords.lat}°</span>
+              <span className="font-semibold text-cyan-300">{displayLat}°</span>
               ,
               <span className="font-semibold text-orange-300">
                 {" "}
-                {coords.lon}°
+                {displayLon}°
               </span>
+              {cityName && (
+                <span className="ml-1 text-slate-200/90">
+                  in{" "}
+                  <span className="font-semibold text-cyan-200">
+                    {cityName}
+                  </span>
+                </span>
+              )}
             </p>
           </div>
         </header>
+
         <LocationDropdown location={location} setLocation={setLocation} />
+
         <div className="w-full rounded-2xl overflow-hidden">
-          <Map coords={coords} onMapClick={onMapClick} mapType="basic-dark" />
+          <Map coords={coords} onMapClick={onMapClick} mapType={mapType} />
         </div>
 
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
