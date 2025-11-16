@@ -1,13 +1,14 @@
+import { useState } from "react";
 import AdditionalInfo from "./components/cards/AdditionalInfo";
 import CurrentWeather from "./components/cards/CurrentWeather";
 import DailyForecast from "./components/cards/DailyForecast";
 import HourlyForecast from "./components/cards/HourlyForecast";
+import Map from "./components/Map";
+import type { Coords } from "./types";
+import LocationDropdown from "./components/dropdowns/LocationDropdown";
 
 function App() {
-  // const { data } = useQuery({
-  //   queryKey: ["weather"],
-  //   queryFn: () => getWeather(10, 25), // Example coordinates for New York City
-  // });
+  const [coords, setCoords] = useState<Coords>({ lat: 35.99, lon: -79.99 });
 
   return (
     <main className="min-h-screen text-slate-50">
@@ -28,6 +29,7 @@ function App() {
               </span>
             </h1>
           </div>
+
           <div className="flex flex-col items-start md:items-end gap-3">
             <div className="tag-pill flex items-center gap-2">
               <span className="h-1.5 w-6 rounded-full pill-gradient" />
@@ -35,28 +37,39 @@ function App() {
             </div>
             <p className="text-xs text-slate-300/80 max-w-xs text-left md:text-right">
               Coordinates locked on{" "}
-              <span className="font-semibold text-cyan-300">10.0° N</span>,
-              <span className="font-semibold text-orange-300"> 25.0° E</span>.
-              Modify source later to plug in real locations.
+              <span className="font-semibold text-cyan-300">{coords.lat}°</span>
+              ,
+              <span className="font-semibold text-orange-300">
+                {" "}
+                {coords.lon}°
+              </span>
             </p>
           </div>
         </header>
+        <LocationDropdown location="custom" setLocation={() => {}} />
+        <div className="w-full h-80 rounded-2xl overflow-hidden">
+          <Map
+            coords={coords}
+            onMapClick={(lat, lon) => setCoords({ lat, lon })}
+            mapType="basic-dark"
+          />
+        </div>
 
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-          <CurrentWeather coords={{ lat: 10, lon: 25 }} />
-          <AdditionalInfo coords={{ lat: 10, lon: 25 }} />
+          <CurrentWeather coords={coords} />
+          <AdditionalInfo coords={coords} />
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-          <HourlyForecast coords={{ lat: 10, lon: 25 }} />
-          <DailyForecast coords={{ lat: 10, lon: 25 }} />
+          <HourlyForecast coords={coords} />
+          <DailyForecast coords={coords} />
         </section>
 
         <footer className="mt-2 flex items-center justify-between text-[0.7rem] text-slate-400/80">
-          <p>
-            Powered by vivid gradients, glassmorphism, and your weather backend.
+          <p>Created by Ameer Hasan.</p>
+          <p className="hidden sm:block">
+            Climora · Your favorite weather companion
           </p>
-          <p className="hidden sm:block">Climora · Experimental UI Surface</p>
         </footer>
       </div>
     </main>
