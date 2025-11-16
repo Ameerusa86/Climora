@@ -21,7 +21,7 @@ export default function Map({ coords, onMapClick, mapType }: Props) {
       zoom={5}
       style={{
         width: "100%",
-        height: "320px",
+        height: "420px",
         borderRadius: "1.25rem",
         overflow: "hidden",
         boxShadow: "0 20px 45px rgba(15,23,42,0.8)",
